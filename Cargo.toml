@@ -1,0 +1,7 @@
+[package]
+name = "test_code"
+version = "0.1.0"
+authors = ["myyrakle <sssang97@naver.com>"]
+edition = "2018"
+
+[dependencies]
