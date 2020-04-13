@@ -1,65 +1,10 @@
-use std::{
-    future::{Future},
-    task::{Context, Poll},
-    pin::{Pin},
-    default::{Default},
-    sync::{Arc, Mutex},
-    marker::{Send},
-};
 
-pub struct AsyncThread<R> where R: 'static+Default+Send
+pub mod async_thread;
+pub use async_thread::{AsyncThread};
+
+pub fn spawn(func:fn()->R) where R: 'static+Default+Send -> impl Future
 {
-    state: Arc<Mutex< AsyncThreadState<R> >>,
-}
-
-struct AsyncThreadState<R> where R: 'static+Default+Send
-{
-    return_value: R,
-    done: bool,
-}
-impl<R> AsyncThreadState<R> where R: 'static+Default+Send
-{
-    fn new()->Self
-    {
-        AsyncThreadState{
-            return_value: Default::default(), 
-            done: false,
-        }
-    }
-}
-
-impl<R> AsyncThread<R> where R: 'static+Default+Send {
-    fn spawn(func:fn()->R) -> impl Future {
-        let mutex_state = Arc::new(Mutex::new(
-            AsyncThreadState::<R>::new()
-        ));
-
-        let borrow = mutex_state.clone();
-
-        std::thread::spawn(move || {
-           borrow.lock().expect("실패").return_value = func();
-           borrow.lock().expect("실패").done = true;
-        });
-
-        AsyncThread { state: mutex_state }
-    }
-}
-
-impl<R> Future for AsyncThread<R> where R: 'static+Default+Send
-{
-    type Output = R;
-
-    fn poll(self: Pin<&mut Self>, context: &mut Context) -> Poll<Self::Output>
-    {
-        match *self.lock().expect("붐") {
-            true => Poll::Ready(self.return_value.into_inner().unwrap()), 
-            false => Poll::Pending,
-        }
-    }
-}
-
-fn async_thread(){
-
+    AsyncThreadthread::spawn()
 }
 
 fn main()
