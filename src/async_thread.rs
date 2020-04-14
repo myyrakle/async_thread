@@ -7,8 +7,8 @@ use std::{
     marker::{Send},
 };
 
-mod async_thread_state;
-use async_thread_state::*;
+mod async_state;
+use async_state::*;
 
 pub struct AsyncThread<R> where R: 'static+Default+Send
 {
