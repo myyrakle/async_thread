@@ -7,14 +7,27 @@ use std::{
     marker::{Send},
 };
 
-mod async_state;
-use async_state::*;
+struct AsyncThreadState<R> where R: 'static+Default+Send
+{
+    return_value: R,
+    done: bool,
+}
+
+impl<R> AsyncThreadState<R> where R: 'static+Default+Send
+{
+    fn new()->Self
+    {
+        AsyncThreadState{
+            return_value: Default::default(), 
+            done: false,
+        }
+    }
+}
 
 pub struct AsyncThread<R> where R: 'static+Default+Send
 {
     state: Arc<Mutex< AsyncThreadState<R> >>,
 }
-
 
 impl<R> AsyncThread<R> where R: 'static+Default+Send {
     fn spawn(func:fn()->R) -> impl Future {
