@@ -50,11 +50,15 @@ impl<R> Future for AsyncThread<R> where R: 'static+Default+Send
 {
     type Output = R;
 
-    fn poll(self: Pin<&mut Self>, context: &mut Context) -> Poll<Self::Output>
+    fn poll(self: Pin<&mut Self>, _context: &mut Context) -> Poll<Self::Output>
     {
-        match self.as_mut().lock().expect("붐") {
-            true => Poll::Ready(self.return_value.into_inner().unwrap()), 
+        let locked = self.state.lock().expect("붐");
+        match locked.done
+        {
+            true => Poll::Ready(locked.return_value), 
             false => Poll::Pending,
         }
     }
 }
+
+
