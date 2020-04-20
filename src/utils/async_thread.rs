@@ -55,7 +55,7 @@ impl<R> Future for AsyncThread<R> where R: 'static+Default+Send
         let locked = self.state.lock().expect("붐");
         match locked.done
         {
-            true => Poll::Ready(locked.return_value), 
+            true => Poll::Ready(locked.return_value), // ?? How to solve
             false => Poll::Pending,
         }
     }
